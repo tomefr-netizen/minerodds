@@ -1,0 +1,4 @@
+<IfModule mod_alias.c>
+    RedirectMatch 404 /\.git(?:/|$)
+    RedirectMatch 404 /\.env(?:\.|/|$)
+</IfModule>

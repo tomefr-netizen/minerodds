@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import { estimate, YEAR } from '../assets/math.js';
+
+const settings = {hashrate:1,uptime:100,power:100,electricity:0.2,fee:2};
+const coin = {available:true,difficulty:1e12*YEAR/2**32,reward:10,price:2};
+const result = estimate(coin,settings);
+assert.ok(Math.abs(result.year-(1-Math.exp(-1))*100)<1e-10);
+assert.ok(Math.abs(result.wait-1)<1e-12);
+assert.ok(result.day<result.week && result.week<result.month && result.month<result.year);
+assert.ok(Math.abs(result.yieldDay-10/365*0.98)<1e-12);
+assert.ok(Math.abs(result.electricity-0.48)<1e-12);
+assert.ok(Math.abs(result.profit-(result.revenue-0.48))<1e-12);
+assert.equal(estimate(coin,{...settings,hashrate:0}).year,0);
+assert.equal(estimate(coin,{...settings,hashrate:0}).wait,Infinity);
+assert.equal(estimate(coin,{...settings,uptime:0}).electricity,0);
+assert.equal(estimate(coin,{...settings,fee:100}).revenue,0);
+assert.equal(estimate({...coin,price:null},settings).profit,null);
+assert.equal(estimate({...coin,available:false},settings).day,null);
+assert.ok(estimate({...coin,difficulty:1e30},settings).day>0);
+console.log('Mining probability and earnings checks passed.');
